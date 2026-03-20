@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --palace-dark: #050510;
+  --palace-blue: #3b82f6;
+  --palace-purple: #8b5cf6;
+}
+
+body {
+  background-color: var(--palace-dark);
+}
