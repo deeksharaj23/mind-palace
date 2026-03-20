@@ -14,7 +14,7 @@ export function Constellation() {
   const [hoveredNode, setHoveredNode] = useState<{ node: (typeof graphNodes)[0]; x: number; y: number } | null>(null);
   const {
     getDisplayNodes,
-    loadPatternsAndInsights,
+    loadNodes,
     highlightedNodeIds,
     selectedNodeIds,
     selectNode,
@@ -28,8 +28,8 @@ export function Constellation() {
   );
 
   useEffect(() => {
-    loadPatternsAndInsights();
-  }, [loadPatternsAndInsights]);
+    loadNodes();
+  }, [loadNodes]);
 
   useEffect(() => {
     const onResize = () =>

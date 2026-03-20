@@ -4,6 +4,26 @@ import { detectPatterns, generateInsight } from "@/lib/pattern-engine";
 import { MOCK_NODES } from "@/data/mock-nodes";
 
 const MAX_NODES_RENDERED = 100;
+const STORAGE_KEY = "mind-palace-nodes";
+
+function loadFromStorage(): Node[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveToStorage(nodes: Node[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
+  } catch {}
+}
 
 interface MindPalaceState {
   nodes: Node[];
@@ -15,6 +35,8 @@ interface MindPalaceState {
   useMockData: boolean;
 
   setNodes: (nodes: Node[]) => void;
+  addNode: (node: Omit<Node, "id" | "timestamp">) => void;
+  loadNodes: () => void;
   loadPatternsAndInsights: () => void;
   setCurrentInsightIndex: (index: number) => void;
   nextInsight: () => void;
@@ -36,9 +58,29 @@ export const useMindPalaceStore = create<MindPalaceState>((set, get) => ({
 
   setNodes: (nodes) => set({ nodes }),
 
+  addNode: (node) => {
+    const newNode: Node = {
+      ...node,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+    };
+    const stored = loadFromStorage();
+    const updated = [newNode, ...stored];
+    saveToStorage(updated);
+    set({ nodes: updated });
+    get().loadPatternsAndInsights();
+  },
+
+  loadNodes: () => {
+    const stored = loadFromStorage();
+    const source = stored.length > 0 ? stored : MOCK_NODES;
+    set({ nodes: source });
+    get().loadPatternsAndInsights();
+  },
+
   loadPatternsAndInsights: () => {
-    const { nodes, useMockData } = get();
-    const source = useMockData && nodes.length === 0 ? MOCK_NODES : nodes;
+    const { nodes } = get();
+    const source = nodes.length > 0 ? nodes : MOCK_NODES;
     if (source.length === 0) return;
 
     const patterns = detectPatterns(source);
@@ -47,6 +89,7 @@ export const useMindPalaceStore = create<MindPalaceState>((set, get) => ({
     set({
       nodes: source,
       patterns,
+      useMockData: nodes.length === 0,
       insights,
       currentInsightIndex: 0,
       highlightedNodeIds:

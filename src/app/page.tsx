@@ -16,12 +16,20 @@ export default function HomePage() {
         Discover patterns in your thoughts. Your insights await in the
         constellation.
       </p>
-      <Link
-        href="/insights"
-        className="px-8 py-3 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-200 border border-violet-500/30 transition-all"
-      >
-        Enter the constellation
-      </Link>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Link
+          href="/insights"
+          className="px-8 py-3 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-200 border border-violet-500/30 transition-all text-center"
+        >
+          View insights
+        </Link>
+        <Link
+          href="/insights?add=1"
+          className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 border border-white/20 transition-all text-center"
+        >
+          + Add entry
+        </Link>
+      </div>
     </div>
   );
 }
